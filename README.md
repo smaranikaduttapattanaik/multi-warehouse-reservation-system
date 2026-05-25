@@ -61,22 +61,36 @@ This project simulates a real-world e-commerce inventory reservation flow where 
 app/
 │
 ├── api/
+│   ├── cron/
+│   │   └── release-expired/
+│   │       └── route.ts
+│   │
 │   ├── products/
+│   │   └── route.ts
+│   │
 │   ├── reservations/
 │   │   ├── route.ts
-│   │   ├── [id]/
-│   │   │   ├── route.ts
-│   │   │   ├── confirm/
-│   │   │   └── release/
-│   └── cron/
-│       └── release-expired/
+│   │   │
+│   │   └── [id]/
+│   │       ├── route.ts
+│   │       │
+│   │       ├── confirm/
+│   │       │   └── route.ts
+│   │       │
+│   │       └── release/
+│   │           └── route.ts
+│   │
+│   └── warehouses/
+│       └── route.ts
 │
 ├── reservations/
 │   └── [id]/
 │       └── page.tsx
 │
-├── page.tsx
+├── favicon.ico
+├── globals.css
 ├── layout.tsx
+└── page.tsx
 │
 components/
 ├── ProductCard.tsx
@@ -90,8 +104,9 @@ lib/
 prisma/
 ├── schema.prisma
 └── seed.ts
+│
+public/
 ```
-
 ---
 
 # Database Schema

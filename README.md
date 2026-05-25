@@ -1,36 +1,326 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Multi-Warehouse Reservation System
 
-## Getting Started
+A concurrency-safe inventory reservation system built with Next.js, Prisma, PostgreSQL, and TypeScript.
 
-First, run the development server:
+This project simulates a real-world e-commerce inventory reservation flow where stock can be temporarily reserved, confirmed, released, or automatically restored after expiry.
+
+---
+
+# Features
+
+## Inventory Management
+- Multi-warehouse inventory support
+- Real-time available stock tracking
+- Warehouse-wise stock display
+- Out-of-stock handling
+
+## Reservation System
+- Create temporary reservations
+- Confirm reservations
+- Cancel reservations
+- Automatic reservation expiry
+- Automatic stock restoration after expiry
+
+## Concurrency Safety
+- Transaction-safe reservation creation
+- Prevents overselling
+- Uses Prisma transactions
+- Handles simultaneous reservation attempts safely
+
+## Frontend UI
+- Dark modern responsive UI
+- Product cards
+- Live stock counters
+- Reservation checkout page
+- Countdown timer
+- Status updates
+- Auto refresh after actions
+
+---
+
+# Tech Stack
+
+## Frontend
+- Next.js 16
+- React
+- TypeScript
+
+## Backend
+- Next.js API Routes
+- Prisma ORM
+- PostgreSQL
+
+## Database
+- PostgreSQL
+
+---
+
+# Project Structure
+
+```bash
+app/
+│
+├── api/
+│   ├── products/
+│   ├── reservations/
+│   │   ├── route.ts
+│   │   ├── [id]/
+│   │   │   ├── route.ts
+│   │   │   ├── confirm/
+│   │   │   └── release/
+│   └── cron/
+│       └── release-expired/
+│
+├── reservations/
+│   └── [id]/
+│       └── page.tsx
+│
+├── page.tsx
+├── layout.tsx
+│
+components/
+├── ProductCard.tsx
+└── ReservationCheckout.tsx
+│
+lib/
+├── prisma.ts
+├── schemas.ts
+└── expiry.ts
+│
+prisma/
+├── schema.prisma
+└── seed.ts
+```
+
+---
+
+# Database Schema
+
+## Product
+Stores product information.
+
+## Warehouse
+Stores warehouse details.
+
+## Inventory
+Tracks stock per warehouse.
+
+## Reservation
+Handles temporary stock reservations.
+
+---
+
+# Reservation Lifecycle
+
+## 1. Product Reservation
+User clicks Reserve.
+
+Backend:
+- validates inventory
+- checks available stock
+- creates reservation
+- increments reserved units
+
+## 2. Checkout Page
+User is redirected to reservation checkout page.
+
+Features:
+- countdown timer
+- confirm button
+- cancel button
+- live status updates
+
+## 3. Reservation Confirmation
+If user confirms:
+- reservation status becomes CONFIRMED
+- reserved stock remains allocated
+
+## 4. Reservation Cancellation
+If user cancels:
+- reservation becomes RELEASED
+- reserved stock restored
+
+## 5. Reservation Expiry
+If timer expires:
+- reservation becomes EXPIRED
+- stock restored automatically
+
+---
+
+# Concurrency Handling
+
+The system prevents overselling using Prisma transactions.
+
+Reservation creation:
+- locks inventory operation
+- checks current available stock
+- safely updates reserved units
+
+This ensures:
+- multiple users cannot oversell stock
+- inventory remains consistent
+
+---
+
+# API Endpoints
+
+## Products
+
+### Get Products
+```http
+GET /api/products
+```
+
+---
+
+## Reservations
+
+### Create Reservation
+```http
+POST /api/reservations
+```
+
+Request Body:
+```json
+{
+  "inventoryId": "inventory_id",
+  "quantity": 1
+}
+```
+
+---
+
+### Get Reservation
+```http
+GET /api/reservations/:id
+```
+
+---
+
+### Confirm Reservation
+```http
+POST /api/reservations/:id/confirm
+```
+
+---
+
+### Release Reservation
+```http
+POST /api/reservations/:id/release
+```
+
+---
+
+## Cron Endpoint
+
+### Release Expired Reservations
+```http
+GET /api/cron/release-expired
+```
+
+Requires:
+```http
+Authorization: your-secret-key
+```
+
+---
+
+# Setup Instructions
+
+## 1. Clone Repository
+
+```bash
+git clone <your-repo-url>
+cd multi-warehouse-reservation-system
+```
+
+---
+
+## 2. Install Dependencies
+
+```bash
+npm install
+```
+
+---
+
+## 3. Setup Environment Variables
+
+Create `.env` file:
+
+```env
+DATABASE_URL="your_postgres_url"
+
+CRON_SECRET="your-secret-key"
+```
+
+---
+
+## 4. Setup Database
+
+```bash
+npx prisma migrate dev
+```
+
+---
+
+## 5. Seed Database
+
+```bash
+npm run db:seed
+```
+
+---
+
+## 6. Start Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+# Testing Flow
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Reservation Flow
+1. Open homepage
+2. Click Reserve
+3. Go to checkout page
+4. Confirm or cancel reservation
 
-## Learn More
+## Expiry Flow
+1. Create reservation
+2. Wait for timer expiry
+3. Reservation becomes EXPIRED
+4. Stock automatically restores
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Future Improvements
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Authentication
+- Admin dashboard
+- Redis queue for expiry jobs
+- WebSocket live updates
+- Toast notifications
+- Skeleton loaders
+- Payment integration
+- Order management
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# Screenshots
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Add screenshots here.
+
+---
+
+# Author
+
+Smaranika Dutta
+
+---
+
+# License
+
+MIT

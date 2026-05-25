@@ -326,7 +326,8 @@ npm run dev
 
 # Screenshots
 
-Add screenshots here.
+<img width="1919" height="916" alt="image" src="https://github.com/user-attachments/assets/a423efd3-e897-4c14-b279-d3eb5140c132" />
+
 
 ---
 
